@@ -19,18 +19,23 @@ module NestedTextOfficialTests
     cases.select { |caze| caze.load_success? }
   end
 
-  class TestCase < Hash
+  class TestCase
     attr_reader :name, :path
 
     def initialize(name, path)
       super()
       @name = name
       @path = path
+      @case = {}
       determine_test_types
     end
 
     def load_success?
-      !self&.[](:load)&.[](:out).nil?
+      !@case&.[](:load)&.[](:out).nil?
+    end
+
+    def [](key)
+      @case[key]
     end
 
     private
@@ -44,28 +49,28 @@ module NestedTextOfficialTests
       dump_err = @path + "/dump_err.json"
 
       if File.exist?(load_in)
-        self[:load] = { in: { path: load_in } }
+        @case[:load] = { in: { path: load_in } }
 
         if File.exist?(load_out) && File.exist?(load_err)
           raise "For a load_in.nt case, only one of load_out.json and load_err.json can exist!"
         elsif File.exist?(load_out)
-          self[:load][:out] = { path: load_out, data: JSON.load_file(load_out) }
+          @case[:load][:out] = { path: load_out, data: JSON.load_file(load_out) }
         elsif File.exist?(load_err)
-          self[:load][:err] = { path: load_out, data: JSON.load_file(load_err) }
+          @case[:load][:err] = { path: load_out, data: JSON.load_file(load_err) }
         else
           raise "For a load_in.nt case, one of load_out.json and load_err.json must exist!"
         end
       end
 
       if File.exist?(dump_in)
-        self[:dump] = { in: { path: dump_in, data: JSON.load_file(dump_in) } }
+        @case[:dump] = { in: { path: dump_in, data: JSON.load_file(dump_in) } }
 
         if File.exist?(dump_out) && File.exist?(dump_err)
           raise "For a dump_in.json case, only one of dump_out.nt and dump_err.json can exist!"
         elsif File.exist?(dump_out)
-          self[:dump][:out] = { path: dump_out }
+          @case[:dump][:out] = { path: dump_out }
         elsif File.exist?(dump_err)
-          self[:dump][:err] = { path: dump_out, data: JSON.load_file(dump_err) }
+          @case[:dump][:err] = { path: dump_out, data: JSON.load_file(dump_err) }
         else
           raise "For a dump_in.json case, one of dump_out.json and dump_err.json must exist!"
         end
