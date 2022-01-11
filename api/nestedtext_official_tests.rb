@@ -23,6 +23,14 @@ module NestedTextOfficialTests
     cases.select { |caze| caze.load_error? }
   end
 
+  def select_dump_success(cases)
+    cases.select { |caze| caze.dump_success? }
+  end
+
+  def select_dump_error(cases)
+    cases.select { |caze| caze.dump_error? }
+  end
+
   class TestCase
     attr_reader :name, :path
 
@@ -40,6 +48,14 @@ module NestedTextOfficialTests
 
     def load_error?
       !@case&.[](:load)&.[](:err).nil?
+    end
+
+    def dump_sucess?
+      !@case&.[](:dump)&.[](:out).nil?
+    end
+
+    def dump_error?
+      !@case&.[](:dump)&.[](:err).nil?
     end
 
     def [](key)
