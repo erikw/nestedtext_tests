@@ -50,7 +50,7 @@ module NestedTextOfficialTests
       !@case&.[](:load)&.[](:err).nil?
     end
 
-    def dump_sucess?
+    def dump_success?
       !@case&.[](:dump)&.[](:out).nil?
     end
 
@@ -92,7 +92,7 @@ module NestedTextOfficialTests
         if File.exist?(dump_out) && File.exist?(dump_err)
           raise "For a dump_in.json case, only one of dump_out.nt and dump_err.json can exist!"
         elsif File.exist?(dump_out)
-          @case[:dump][:out] = { path: dump_out }
+          @case[:dump][:out] = { path: dump_out, data: File.read(dump_out) }
         elsif File.exist?(dump_err)
           @case[:dump][:err] = { path: dump_out, data: JSON.load_file(dump_err) }
         else
