@@ -64,11 +64,17 @@ module NestedTextOfficialTests
 
     private
 
+    def self.load_ruby_file(file)
+      require_relative file.delete_suffix(".rb")
+      DATA
+    end
+
     def determine_test_types
       load_in =  @path + "/load_in.nt"
       load_out = @path + "/load_out.json"
       load_err = @path + "/load_err.json"
-      dump_in =  @path + "/dump_in.json"
+      dump_in_json = @path + "/dump_in.json"
+      dump_in_ruby = @path + "/dump_in.rb"
       dump_out = @path + "/dump_out.nt"
       dump_err = @path + "/dump_err.json"
 
@@ -86,8 +92,16 @@ module NestedTextOfficialTests
         end
       end
 
-      if File.exist?(dump_in)
-        @case[:dump] = { in: { path: dump_in, data: JSON.load_file(dump_in) } }
+      if File.exist?(dump_in_json) || File.exist?(dump_in_ruby)
+        if File.exist?(dump_in_json) && File.exist?(dump_in_ruby)
+          raise "For a dump case, only one of the input files dump_in.json and dump_in.rb can exist!"
+        end
+
+        @case[:dump] = if File.exist?(dump_in_json)
+                         { in: { path: dump_in_json, data: JSON.load_file(dump_in_json) } }
+                       else
+                         { in: { path: dump_in_ruby, data: TestCase.load_ruby_file(dump_in_ruby) } }
+                       end
 
         if File.exist?(dump_out) && File.exist?(dump_err)
           raise "For a dump_in.json case, only one of dump_out.nt and dump_err.json can exist!"
