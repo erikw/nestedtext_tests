@@ -84,9 +84,9 @@ module NestedTextOfficialTests
         if File.exist?(load_out) && File.exist?(load_err)
           raise "For a load_in.nt case, only one of load_out.json and load_err.json can exist!"
         elsif File.exist?(load_out)
-          @case[:load][:out] = { path: load_out, data: JSON.load_file(load_out) }
+          @case[:load][:out] = { path: load_out, data: JSON.load(load_out) }
         elsif File.exist?(load_err)
-          @case[:load][:err] = { path: load_out, data: JSON.load_file(load_err) }
+          @case[:load][:err] = { path: load_out, data: JSON.load(load_err) }
         else
           raise "For a load_in.nt case, one of load_out.json and load_err.json must exist!"
         end
@@ -98,7 +98,7 @@ module NestedTextOfficialTests
         end
 
         @case[:dump] = if File.exist?(dump_in_json)
-                         { in: { path: dump_in_json, data: JSON.load_file(dump_in_json) } }
+                         { in: { path: dump_in_json, data: JSON.load(dump_in_json) } }
                        else
                          { in: { path: dump_in_ruby, data: TestCase.load_ruby_file(dump_in_ruby) } }
                        end
@@ -108,7 +108,7 @@ module NestedTextOfficialTests
         elsif File.exist?(dump_out)
           @case[:dump][:out] = { path: dump_out, data: File.read(dump_out) }
         elsif File.exist?(dump_err)
-          @case[:dump][:err] = { path: dump_out, data: JSON.load_file(dump_err) }
+          @case[:dump][:err] = { path: dump_out, data: JSON.load(dump_err) }
         else
           raise "For a dump_in.json case, one of dump_out.json and dump_err.json must exist!"
         end
